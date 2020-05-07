@@ -1,0 +1,112 @@
+CREATE TABLE product (
+    item_number   	VARCHAR2(10) NOT NULL,
+    description   		VARCHAR2(30),
+    price         		NUMBER(7,2),
+    discount      		NUMBER(7,2)
+);
+
+ALTER TABLE product ADD CONSTRAINT product_pk PRIMARY KEY ( item_number );
+
+CREATE TABLE shop (
+    name           		VARCHAR2(30) NOT NULL,
+    road           		VARCHAR2(30) NOT NULL,
+    city           		VARCHAR2(20) NOT NULL,
+    stateid       		CHAR(2) NOT NULL,
+    zipcode        		CHAR(5) NOT NULL,
+    taxrate        		NUMBER(7,6) NOT NULL,
+    phone          		CHAR(14) NOT NULL,
+    fax            		CHAR(14),
+    returndays     	NUMBER(3) NOT NULL,
+    returninfo     		VARCHAR2(50) NOT NULL,
+    restockfee     		NUMBER(3,2),
+    warrentydays   	NUMBER(3)
+);
+
+ALTER TABLE shop
+    ADD CONSTRAINT shop_pk PRIMARY KEY ( name,
+    road,
+    city,
+    stateid,
+    zipcode );
+
+CREATE TABLE costumer (
+    costumer_number   	VARCHAR2(6) NOT NULL,
+    name              		VARCHAR2(40) NOT NULL,
+    phone_number      	CHAR(14) NOT NULL,
+    road              		VARCHAR2(30) NOT NULL,
+    city              		VARCHAR2(20) NOT NULL,
+    state_id          		CHAR(2) NOT NULL,
+    zipcode           	CHAR(5) NOT NULL,
+    tax_number        	VARCHAR2(20),
+    fax_number        	CHAR(14),
+    p_o_number        	VARCHAR2(10),
+    tax_exempt        	CHAR(1),
+    work_number       	CHAR(14),
+    deductible        	NUMBER(7,2)
+);
+
+CREATE TABLE invoice (
+    invoice_number             	VARCHAR2(8) NOT NULL,
+    "Date/Time"                	VARCHAR2(20) NOT NULL,
+    console                    	CHAR(3) NOT NULL,
+    sellerid                   	VARCHAR2(20) NOT NULL,
+    flat_charge                	NUMBER(7,2),
+    shipping_charges           	NUMBER(7,2),
+    "SO/Layaway"               	NUMBER(7,2),
+    deposit_down_pmt           	NUMBER(7,2),
+    deposit_pmt_applied        	NUMBER(7,2),
+    layaway_pmt_made           	NUMBER(7,2),
+    layaway_pmt_applied        	NUMBER(7,2),
+    checkno                    	VARCHAR2(15),
+    cardtype                   	VARCHAR2(4),
+    cardexpiredate             	CHAR(8),
+    lastdigitcardno            	CHAR(4),
+    dollaramount              	NUMBER(7,2),
+    checkamount                	NUMBER(7,2),
+    cardamount                 	NUMBER(7,2),
+    giftcertificateamount      	NUMBER(7,2),
+    onaccount                  	NUMBER(7,2),
+    costumer_costumer_number   VARCHAR2(6) NOT NULL,
+    shop_name                  	VARCHAR2(30) NOT NULL,
+    shop_road                  	VARCHAR2(30) NOT NULL,
+    shop_city                  	VARCHAR2(20) NOT NULL,
+    shop_stateid               	CHAR(2) NOT NULL,
+    shop_zipcode               	CHAR(5) NOT NULL
+);
+
+ALTER TABLE invoice ADD CONSTRAINT invoice_pk PRIMARY KEY ( invoice_number );
+
+ALTER TABLE invoice
+    ADD CONSTRAINT invoice_costumer_fk FOREIGN KEY ( costumer_costumer_number )
+        REFERENCES costumer ( costumer_number );
+
+ALTER TABLE invoice
+    ADD CONSTRAINT invoice_shop_fk FOREIGN KEY ( shop_name,
+    shop_road,
+    shop_city,
+    shop_stateid,
+    shop_zipcode )
+        REFERENCES shop ( name,
+        road,
+        city,
+        stateid,
+        zipcode );
+
+CREATE TABLE product_quantity (
+    product_item_number      	VARCHAR2(10) NOT NULL,
+    invoice_invoice_number   	VARCHAR2(8) NOT NULL,
+    delivered_quantity       	NUMBER(6),
+    so_quantity              	NUMBER(6)
+);
+
+ALTER TABLE product_quantity ADD CONSTRAINT product_quantity_pk PRIMARY KEY ( product_item_number,
+invoice_invoice_number );
+
+ALTER TABLE product_quantity
+    ADD CONSTRAINT product_quantity_invoice_fk FOREIGN KEY ( invoice_invoice_number )
+        REFERENCES invoice ( invoice_number );
+
+ALTER TABLE product_quantity
+    ADD CONSTRAINT product_quantity_product_fk FOREIGN KEY ( product_item_number )
+        REFERENCES product ( item_number );
+
